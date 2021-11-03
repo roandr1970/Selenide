@@ -12,19 +12,17 @@ import static com.codeborne.selenide.Selenide.*;
 class RegistrationTest {
     @Test
     void shouldApplicationForIssuingCard() {
-        DataGenerator generator = new DataGenerator();
-        String data = generator.dataGenerator(3);
+        String meetingDate = DataGenerator.generateDate(3);
         open("http://localhost:9999");
         $("[type='text']").setValue("Москва");
         $("[type='tel']").doubleClick().sendKeys(Keys.BACK_SPACE);
-        $("[type='tel']").setValue(data);
+        $("[type='tel']").setValue(meetingDate);
         $("[name='name']").setValue("Тапочкин Вася");
         $("[name='phone']").setValue("+71111111111");
         $("[data-test-id='agreement']").click();
         $(withText("Забронировать")).click();
-        String text = "Встреча успешно забронирована на";
-        String text2 = data;
-        $(withText(text)).shouldBe(appear, Duration.ofSeconds(15));
-        $(withText(text2)).shouldBe(appear);
+        $("[data-test-id='notification'] .notification__content")
+                .shouldBe(visible, Duration.ofSeconds(15))
+                .shouldHave(exactText("Встреча успешно забронирована на " + meetingDate));
     }
 }
